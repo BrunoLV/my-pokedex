@@ -13,5 +13,13 @@ datasources:
   default:
     driver-class-name: com.mysql.cj.jdbc.Driver
     db-type: mysql
-    schema-generate: CREATE_DROP
+    url: ${DATASOURCES_DEFAULT_URL:jdbc:mysql://localhost:3306/mypokedex}
+    username: ${DATASOURCES_DEFAULT_USERNAME:pokedex}
+    password: ${DATASOURCES_DEFAULT_PASSWORD:pokedex}
+    schema-generate: NONE # safer default for local/dev; change to CREATE or CREATE_DROP if you need auto schema generation
     dialect: MYSQL
+    dialect-copy: MYSQL
+    # Hikari pool settings
+    maximumPoolSize: ${DATASOURCES_DEFAULT_MAX_POOL_SIZE:10}
+    minimumIdle: ${DATASOURCES_DEFAULT_MIN_IDLE:2}
+    connectionTimeout: ${DATASOURCES_DEFAULT_CONNECTION_TIMEOUT:30000}

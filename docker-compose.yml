@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: mypokedex
+      MYSQL_USER: pokedex
+      MYSQL_PASSWORD: pokedex
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '8080:8080'
+    environment:
+      - DATASOURCES_DEFAULT_URL=jdbc:mysql://db:3306/mypokedex
+      - DATASOURCES_DEFAULT_USERNAME=pokedex
+      - DATASOURCES_DEFAULT_PASSWORD=pokedex
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: on-failure
+
+volumes:
+  db_data:
