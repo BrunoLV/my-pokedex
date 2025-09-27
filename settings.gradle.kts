@@ -1,4 +1,2 @@
-
-
-rootProject.name="my-pokedex"
+rootProject.name = "my-pokedex"
 

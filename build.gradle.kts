@@ -42,7 +42,10 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-suite-engine")
     testImplementation("org.mock-server:mockserver-client-java:5.15.0")
     testImplementation("org.mockito:mockito-core")
+    testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
+    testRuntimeOnly("com.h2database:h2:2.1.214")
+    testImplementation("com.zaxxer:HikariCP:5.0.1")
 }
 
 
@@ -82,5 +85,3 @@ micronaut {
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
     jdkVersion = "21"
 }
-
-

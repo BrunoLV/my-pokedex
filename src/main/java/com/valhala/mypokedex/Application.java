@@ -1,14 +1,14 @@
 package com.valhala.mypokedex;
 
 import io.micronaut.runtime.Micronaut;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.info.*;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Info;
 
 @OpenAPIDefinition(
-    info = @Info(
-            title = "my-pokedex",
-            version = "0.0"
-    )
+        info = @Info(
+                title = "my-pokedex",
+                version = "0.0"
+        )
 )
 public class Application {
 

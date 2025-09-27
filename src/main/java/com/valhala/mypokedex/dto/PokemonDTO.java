@@ -5,14 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PokemonDTO {
-    public int id;
-    public String name;
-    public List<String> types = new ArrayList<>();
-    public Map<String, Integer> base_stats = new HashMap<>();
-    public Map<String, String> sprites = new HashMap<>();
-    public List<String> abilities = new ArrayList<>();
-    public String source_url;
-
-    public PokemonDTO() {}
+public record PokemonDTO(
+        int id,
+        String name,
+        List<String> types,
+        Map<String, Integer> base_stats,
+        Map<String, String> sprites,
+        List<String> abilities,
+        String source_url
+) {
+    public static PokemonDTO empty() {
+        return new PokemonDTO(
+                0,
+                null,
+                new ArrayList<>(),
+                new HashMap<>(),
+                new HashMap<>(),
+                new ArrayList<>(),
+                null
+        );
+    }
 }

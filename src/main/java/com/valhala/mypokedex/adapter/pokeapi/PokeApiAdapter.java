@@ -1,7 +1,7 @@
-package com.valhala.mypokedex.adapter;
+package com.valhala.mypokedex.adapter.pokeapi;
 
 import java.util.Optional;
 
-public interface UpstreamAdapter {
+public interface PokeApiAdapter {
     Optional<String> fetchPokemonRaw(String identifier);
 }
