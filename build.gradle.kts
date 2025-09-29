@@ -50,13 +50,12 @@ dependencies {
 
 
 application {
-    mainClass = "com.valhala.mypokedex.Application"
+    mainClass = "com.valhala.mypokedex.application.Application"
 }
 java {
     sourceCompatibility = JavaVersion.toVersion("21")
     targetCompatibility = JavaVersion.toVersion("21")
 }
-
 
 graalvmNative.toolchainDetection = false
 
