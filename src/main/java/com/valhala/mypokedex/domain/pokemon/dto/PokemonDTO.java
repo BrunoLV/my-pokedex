@@ -5,15 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record PokemonDTO(
         int id,
         String identifier,
         List<String> types,
-        Map<String, Integer> base_stats,
+        @JsonProperty("base_stats") Map<String, Integer> baseStats,
         Map<String, String> sprites,
         List<String> abilities,
-        String source_url
-) {
+        @JsonProperty("source_url") String sourceUrl) {
     public static PokemonDTO empty() {
         return new PokemonDTO(
                 0,
@@ -22,7 +23,6 @@ public record PokemonDTO(
                 new HashMap<>(),
                 new HashMap<>(),
                 new ArrayList<>(),
-                null
-        );
+                null);
     }
 }

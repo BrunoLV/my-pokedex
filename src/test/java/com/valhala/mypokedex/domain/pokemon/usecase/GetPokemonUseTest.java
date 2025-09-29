@@ -77,10 +77,10 @@ class GetPokemonUseTest {
         assertEquals(4, dto.id());
         assertEquals("charmander", dto.identifier());
         assertEquals(List.of("fire"), dto.types());
-        assertEquals(Map.of("speed", 65), dto.base_stats());
+        assertEquals(Map.of("speed", 65), dto.baseStats());
         assertEquals(Map.of("front_default", "https://img.pk/sprite.png"), dto.sprites());
         assertEquals(List.of("blaze"), dto.abilities());
-        assertTrue(dto.source_url().contains("pokeapi"));
+        assertTrue(dto.sourceUrl().contains("pokeapi"));
 
         // verify repository.save called
         verify(repository, times(1)).save(any(PokemonEntity.class));
@@ -114,10 +114,10 @@ class GetPokemonUseTest {
         PokemonDTO dto = result.get();
         assertEquals(0, dto.id());
         assertEquals(id, dto.identifier());
-        assertNotNull(dto.base_stats());
+        assertNotNull(dto.baseStats());
         assertNotNull(dto.sprites());
         assertNotNull(dto.types());
-        assertTrue(dto.source_url().contains(id));
+        assertTrue(dto.sourceUrl().contains(id));
 
         verify(repository, times(1)).save(any(PokemonEntity.class));
         verify(cache, times(1)).put(eq(id), any(PokemonDTO.class));
@@ -137,4 +137,3 @@ class GetPokemonUseTest {
         verify(upstream, never()).fetchPokemonRaw(anyString());
     }
 }
-
