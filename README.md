@@ -75,148 +75,188 @@ Troubleshooting (comum)
 - Erro: Java incompatível
     - Solução: Instalar Java 17+ ou usar `./gradlew` que baixa runtime adequado em alguns setups.
 - Build lento / problemas de rede ao baixar dependências
-    - Solução: Verificar cache do Gradle (`~/.gradle`) ou configurar mirror de repositório.
+    ```markdown
+    # My Pokedex
 
-Links úteis
+    My Pokedex is a sample JVM application built with Micronaut. It aims to be a learning reference, an experimentation
+    base, and a starting point for services that expose Pokémon-related APIs.
 
-- Especificações de features: `specs/`
-- Planos e tarefas da feature de documentação atual: `specs/002-documentação-do-projeto/`
+    Overview
 
-Contato e manutenção
+    - Purpose: provide an API and supporting components to manage and query Pokémon data while demonstrating best
+      practices (TDD, hexagonal architecture, API contracts).
+    - Audience: developers and contributors who want to run, test, and extend the project.
 
-- Mantenedores: ver histórico de commits e `AUTHORS` (se existir) — abra issues para bugs e solicitações de features.
+    Prerequisites
 
-Licença
+    - Java 17 or newer (OpenJDK/Temurin recommended)
+    - Git
+    - Docker (optional — required for some integration tests that use Testcontainers)
 
-- Licença do projeto: consulte `LICENSE` na raiz do repositório (se presente).
+    Clone
 
-## Micronaut 4.9.3 Documentation
+    1. git clone <repo-url>
+    2. cd my-pokedex
 
-- [User Guide](https://docs.micronaut.io/4.9.3/guide/index.html)
-- [API Reference](https://docs.micronaut.io/4.9.3/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/4.9.3/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
+    Build & run
 
----
+    Using the Gradle wrapper (recommended):
 
-- [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
-- [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
-- [Shadow Gradle Plugin](https://gradleup.com/shadow/)
+    ```bash
+    ./gradlew clean build
+    ./gradlew run
+    ```
 
-## Feature openapi documentation
+    Notes:
 
-- [Micronaut OpenAPI Support documentation](https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html)
+    - On Windows use `gradlew.bat` instead of `./gradlew`.
+    - Build artifacts are produced under `build/libs`. The OpenAPI specification is generated under
+      `build/classes/java/main/META-INF/swagger/`.
 
-- [https://www.openapis.org](https://www.openapis.org)
+    Tests
 
-## Feature micronaut-aop documentation
+    - Run unit and integration tests with:
 
-- [Micronaut Aspect-Oriented Programming (AOP) documentation](https://docs.micronaut.io/latest/guide/index.html#aop)
+    ```bash
+    ./gradlew test
+    ```
 
-## Feature jetty-server documentation
+    - Note: some integration tests rely on Testcontainers and require Docker to be available on the host.
 
-- [Micronaut Jetty Server documentation](https://micronaut-projects.github.io/micronaut-servlet/latest/guide/index.html#jetty)
+    Repository layout (high level)
 
-## Feature micronaut-test-rest-assured documentation
+    - `src/` — main source code
+    - `specs/` — feature specifications, plans, contracts and tasks
+    - `build.gradle.kts` — Gradle build configuration
+    - `src/main/resources/application.yml` — runtime configuration
+    - `build/` — generated artifacts and test reports
 
-- [Micronaut Micronaut-Test REST-assured documentation](https://micronaut-projects.github.io/micronaut-test/latest/guide/#restAssured)
+    Architecture & practices
 
-- [https://rest-assured.io/#docs](https://rest-assured.io/#docs)
+    - Architecture: follows Hexagonal / Clean Architecture principles — separation between domain, ports/adapters and
+      infrastructure.
+    - Tests: Test-First (TDD) is expected for new features; each feature should include a specification in `specs/` and
+      tests that initially fail.
+    - Contracts: public APIs should include OpenAPI contracts in `specs/*/contracts/`.
 
-## Feature jdbc-hikari documentation
+    Contributing
 
-- [Micronaut Hikari JDBC Connection Pool documentation](https://micronaut-projects.github.io/micronaut-sql/latest/guide/index.html#jdbc)
+    1. Create a branch using the pattern `###-feature-name` (for example `002-documentation-do-projeto`).
+    2. Add or update a specification under `specs/` (templates are available in `.specify/templates`).
+    3. PR contents should include:
+       - Tests that initially fail demonstrating the desired behavior (unit/contract/integration).
+       - Updated spec in `specs/` and `plan.md` when applicable.
+       - Migration notes if the change breaks existing contracts.
+    4. Open a Pull Request and wait for review. PRs must pass CI (linters, unit & contract tests).
 
-## Feature micronaut-aot documentation
+    Troubleshooting
 
-- [Micronaut AOT documentation](https://micronaut-projects.github.io/micronaut-aot/latest/guide/)
+    - Docker unavailable for Testcontainers:
+      - Install and start Docker Engine / Docker Desktop and make sure your user has permission to access the Docker
+        socket.
+    - Java version compatibility:
+      - Install Java 17+ or use `./gradlew` which can provide a compatible runtime in certain environments.
+    - Slow builds / dependency download issues:
+      - Check the Gradle cache (`~/.gradle`) or configure a repository mirror.
 
-## Feature test-resources documentation
+    Useful links
 
-- [Micronaut Test Resources documentation](https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/)
+    - Feature specifications: `specs/`
+    - Current documentation feature: `specs/002-documentation-do-projeto/`
 
-## Feature mockito documentation
+    Maintainers & contact
 
-- [https://site.mockito.org](https://site.mockito.org)
+    - See the commit history and `AUTHORS` (if present). Open issues for bugs and feature requests.
 
-## Feature json-path documentation
+    License
 
-- [https://github.com/json-path/JsonPath](https://github.com/json-path/JsonPath)
+    - See `LICENSE` in the project root if present.
 
-## Feature guice documentation
+    Micronaut documentation (reference)
 
-- [Micronaut Guice documentation](https://micronaut-projects.github.io/micronaut-guice/latest/guide/index.html)
+    - User Guide: https://docs.micronaut.io/4.9.3/guide/index.html
+    - API Reference: https://docs.micronaut.io/4.9.3/api/index.html
+    - Configuration Reference: https://docs.micronaut.io/4.9.3/guide/configurationreference.html
+    - Micronaut Guides: https://guides.micronaut.io/index.html
 
-## Feature lombok documentation
+    Other references
 
-- [Micronaut Project Lombok documentation](https://docs.micronaut.io/latest/guide/index.html#lombok)
+    - Micronaut Gradle Plugin: https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/
+    - GraalVM Gradle Plugin: https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html
+    - Shadow Gradle Plugin: https://gradleup.com/shadow/
+    - OpenAPI (Micronaut): https://micronaut-projects.github.io/micronaut-openapi/latest/guide/index.html
+    - OpenAPI: https://www.openapis.org
+    - AOP (Micronaut): https://docs.micronaut.io/latest/guide/index.html#aop
+    - Jetty Server (Micronaut): https://micronaut-projects.github.io/micronaut-servlet/latest/guide/index.html#jetty
+    - Micronaut Test (REST-assured): https://micronaut-projects.github.io/micronaut-test/latest/guide/#restAssured
+    - REST-assured: https://rest-assured.io/#docs
+    - Hikari JDBC: https://micronaut-projects.github.io/micronaut-sql/latest/guide/index.html#jdbc
+    - Micronaut AOT: https://micronaut-projects.github.io/micronaut-aot/latest/guide/
+    - Micronaut Test Resources: https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/
+    - Mockito: https://site.mockito.org
+    - JsonPath: https://github.com/json-path/JsonPath
+    - Micronaut Guice: https://micronaut-projects.github.io/micronaut-guice/latest/guide/index.html
+    - Lombok: https://projectlombok.org/features/all
+    - Micronaut OpenAPI Explorer: https://micronaut-projects.github.io/micronaut-openapi/latest/guide/#openapiExplorer
+    - OpenAPI Explorer (external): https://github.com/Authress-Engineering/openapi-explorer
+    - Micronaut HTTP Client: https://docs.micronaut.io/latest/guide/index.html#nettyHttpClient
+    - JUnit Platform Suite Engine: https://junit.org/junit5/docs/current/user-guide/#junit-platform-suite-engine-setup
+    - Micronaut Validation: https://micronaut-projects.github.io/micronaut-validation/latest/guide/
+    - MockServer Java client: https://www.mock-server.com/mock_server/mockserver_clients.html#java-mockserver-client
+    - json-smart: https://netplex.github.io/json-smart/
+    - Micronaut Data JDBC: https://micronaut-projects.github.io/micronaut-data/latest/guide/index.html#jdbc
+    - Jakarta Annotations: https://jakarta.ee/specifications/annotations/
 
-- [https://projectlombok.org/features/all](https://projectlombok.org/features/all)
+    OpenAPI (Swagger) documentation
 
-## Feature openapi-explorer documentation
+    After a build the OpenAPI YAML is generated at `build/classes/java/main/META-INF/swagger/` (for example
+    `my-pokedex-0.1.yml`).
 
-- [Micronaut OpenAPI Explorer View documentation](https://micronaut-projects.github.io/micronaut-openapi/latest/guide/#openapiExplorer)
+    - UI (OpenAPI Explorer): http://localhost:8080/openapi-explorer/ (when the application is running)
+    - Generated YAML: http://localhost:8080/swagger/my-pokedex-0.1.yml (or the file name produced by the build)
 
-- [https://github.com/Authress-Engineering/openapi-explorer](https://github.com/Authress-Engineering/openapi-explorer)
+    To generate the artifacts run:
 
-## Feature http-client documentation
+    ```bash
+    ./gradlew clean build
+    ```
 
-- [Micronaut HTTP Client documentation](https://docs.micronaut.io/latest/guide/index.html#nettyHttpClient)
+    If the UI does not load, check that `classpath:META-INF/swagger` is present in `src/main/resources` or that the build
+    wrote files to `build/classes/java/main/META-INF/swagger`.
 
-## Feature junit-platform-suite-engine documentation
+    Running with Docker Compose
 
-- [https://junit.org/junit5/docs/current/user-guide/#junit-platform-suite-engine-setup](https://junit.org/junit5/docs/current/user-guide/#junit-platform-suite-engine-setup)
+    This repository includes support for running the application locally with Docker Compose:
 
-## Feature validation documentation
+    - `Dockerfile` — a multi-stage build that uses the Gradle wrapper and produces a fat/shadow JAR
+    - `docker-compose.yml` — defines `db` (MySQL) and `app` services
+    - `.dockerignore` — avoids sending heavy artifacts to the build context
 
-- [Micronaut Validation documentation](https://micronaut-projects.github.io/micronaut-validation/latest/guide/)
+    Quick start:
 
-## Feature mockserver-client-java documentation
+    ```bash
+    docker compose up --build
+    ```
 
-- [https://www.mock-server.com/mock_server/mockserver_clients.html#java-mockserver-client](https://www.mock-server.com/mock_server/mockserver_clients.html#java-mockserver-client)
+    The API will be available at http://localhost:8080 (Micronaut default).
 
-## Feature json-smart documentation
+    Docker Compose will create a MySQL database named `mypokedex` with a default user/password `pokedex`/`pokedex`.
+    Environment variables provided to the container include:
 
-- [https://netplex.github.io/json-smart/](https://netplex.github.io/json-smart/)
+    - DATASOURCES_DEFAULT_URL (default: jdbc:mysql://db:3306/mypokedex)
+    - DATASOURCES_DEFAULT_USERNAME (default: pokedex)
+    - DATASOURCES_DEFAULT_PASSWORD (default: pokedex)
 
-## Feature data-jdbc documentation
+    To use a different database, override the variables in `docker-compose.yml` or set them in your environment prior to
+    starting the compose stack.
 
-- [Micronaut Data JDBC documentation](https://micronaut-projects.github.io/micronaut-data/latest/guide/index.html#jdbc)
+    Notes:
 
-## Feature annotation-api documentation
+    - The Dockerfile runs `./gradlew shadowJar`; the first build may take some time. Subsequent rebuilds will reuse layer
+      caches.
+    - If you already have the fat JAR in `build/libs/*all*.jar` you can simplify the container build by using a base image
+      and copying the pre-built JAR.
 
-- [https://jakarta.ee/specifications/annotations/](https://jakarta.ee/specifications/annotations/)
-
-## Rodando com Docker Compose
-
-Foram adicionados os arquivos necessários para executar a aplicação localmente com Docker Compose:
-
-- `Dockerfile` - build multi-stage que usa o Gradle wrapper e produz um fat/shadow jar
-- `docker-compose.yml` - define os serviços `db` (MySQL) e `app`
-- `.dockerignore` - evita enviar artefatos pesados para o contexto de build
-
-Instruções rápidas:
-
-```bash
-docker compose up --build
-```
-
-A API ficará disponível em http://localhost:8080 (porta padrão do Micronaut).
-
-O Compose cria um banco MySQL com database `mypokedex` e usuário `pokedex`/`pokedex`.
-As variáveis passadas ao container são:
-
-- DATASOURCES_DEFAULT_URL (padrão: jdbc:mysql://db:3306/mypokedex)
-- DATASOURCES_DEFAULT_USERNAME (padrão: pokedex)
-- DATASOURCES_DEFAULT_PASSWORD (padrão: pokedex)
-
-Se preferir usar outro banco, sobrescreva as variáveis no `docker-compose.yml` ou defina no ambiente antes de executar.
-
-Observações:
-
-- O Dockerfile executa `./gradlew shadowJar`; na primeira build isso pode demorar. Rebuilds subsequentes aproveitarão
-  cache de camadas.
-- Se já tiver o jar pronto em `build/libs/*all*.jar`, é possível simplificar o fluxo de build (por exemplo, usar imagem
-  base e apenas copiar o jar).
+    ```
 
 

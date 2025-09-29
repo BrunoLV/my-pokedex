@@ -3,6 +3,9 @@ micronaut:
     name: my-pokedex
   router:
     static-resources:
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**
       swagger:
         paths: classpath:META-INF/swagger
         mapping: /swagger/**
