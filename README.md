@@ -224,39 +224,102 @@ Troubleshooting (comum)
     If the UI does not load, check that `classpath:META-INF/swagger` is present in `src/main/resources` or that the build
     wrote files to `build/classes/java/main/META-INF/swagger`.
 
-    Running with Docker Compose
+Running with Docker Compose
 
-    This repository includes support for running the application locally with Docker Compose:
+This repository includes support for running the application locally with Docker Compose.
 
-    - `Dockerfile` — a multi-stage build that uses the Gradle wrapper and produces a fat/shadow JAR
-    - `docker-compose.yml` — defines `db` (MySQL) and `app` services
-    - `.dockerignore` — avoids sending heavy artifacts to the build context
+Core files
 
-    Quick start:
+- `Dockerfile` — multi-stage build that uses the Gradle wrapper and produces a fat/shadow JAR
+- `docker-compose.yml` — main compose file (db + app)
+- `docker-compose.caffeine.override.yml` — override that sets `CACHE_STRATEGY=caffeine` (provided)
+- `docker-compose.redis.override.yml` — override that sets `CACHE_STRATEGY=redis` and `REDIS_HOST`/`REDIS_PORT` (provided)
+- `.dockerignore` — avoids sending heavy artifacts to the build context
 
-    ```bash
-    docker compose up --build
-    ```
+Quick start (defaults)
 
-    The API will be available at http://localhost:8080 (Micronaut default).
+```bash
+docker compose up --build
+```
 
-    Docker Compose will create a MySQL database named `mypokedex` with a default user/password `pokedex`/`pokedex`.
-    Environment variables provided to the container include:
+The API will be available at http://localhost:8080 (Micronaut default).
 
-    - DATASOURCES_DEFAULT_URL (default: jdbc:mysql://db:3306/mypokedex)
-    - DATASOURCES_DEFAULT_USERNAME (default: pokedex)
-    - DATASOURCES_DEFAULT_PASSWORD (default: pokedex)
+Docker Compose will create a MySQL database named `mypokedex` with default credentials `pokedex`/`pokedex`.
+Environment variables provided to the container include:
 
-    To use a different database, override the variables in `docker-compose.yml` or set them in your environment prior to
-    starting the compose stack.
+- `DATASOURCES_DEFAULT_URL` (default: `jdbc:mysql://db:3306/mypokedex`)
+- `DATASOURCES_DEFAULT_USERNAME` (default: `pokedex`)
+- `DATASOURCES_DEFAULT_PASSWORD` (default: `pokedex`)
 
-    Notes:
+Cache strategy support
 
-    - The Dockerfile runs `./gradlew shadowJar`; the first build may take some time. Subsequent rebuilds will reuse layer
-      caches.
-    - If you already have the fat JAR in `build/libs/*all*.jar` you can simplify the container build by using a base image
-      and copying the pre-built JAR.
+This project supports two cache strategies:
 
-    ```
+- `caffeine` — in-memory (default)
+- `redis` — external Redis instance (optional)
+
+We provide two docker-compose override files to make it easy to switch:
+
+- `docker-compose.caffeine.override.yml` — forces `CACHE_STRATEGY=caffeine`
+- `docker-compose.redis.override.yml` — forces `CACHE_STRATEGY=redis` and sets `REDIS_HOST`/`REDIS_PORT`
+
+Run with Caffeine (default) using the override explicitly:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.caffeine.override.yml up --build -d
+```
+
+Run with Redis (start Redis service via the `redis` profile):
+
+```bash
+docker compose --profile redis -f docker-compose.yml -f docker-compose.redis.override.yml up --build -d
+```
+
+Short alternative (one-off environment variable):
+
+```bash
+CACHE_STRATEGY=redis docker compose --profile redis -f docker-compose.yml -f docker-compose.redis.override.yml up --build -d
+```
+
+Using a `.env` file (recommended for local development)
+
+Create a `.env` file in the project root with values you want to reuse locally, for example:
+
+```
+CACHE_STRATEGY=redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
+
+Then run:
+
+```bash
+docker compose --profile redis up --build -d
+```
+
+Verify environment inside the running `app` container:
+
+```bash
+docker compose exec app env | grep CACHE_STRATEGY
+docker compose exec app env | grep REDIS_HOST
+```
+
+Useful checks
+
+```bash
+docker compose logs -f app
+docker compose ps
+docker compose --profile redis ps
+```
+
+Notes
+
+- `REDIS_HOST` defaults to `redis` so the `app` will connect to the `redis` service when the `redis` profile is enabled.
+- If you remove the host port mapping `6379:6379` from the `redis` service, Redis will still be available to the `app` inside
+  the compose network but won't be exposed to the host machine.
+- To run integration tests that rely on Docker/Testcontainers, make sure Docker is running and that your user has permission to
+  access the Docker socket.
+
+If you'd like, I can add a short `docs/development.md` with these commands and examples or a `.env.example` to the repo.
 
 

@@ -1,6 +1,6 @@
 package com.valhala.mypokedex.application.controller;
 
-import com.valhala.mypokedex.adapter.output.cache.PokemonCaffeineCacheAdapter;
+import com.valhala.mypokedex.domain.pokemon.ports.PokemonCachePort;
 import com.valhala.mypokedex.domain.pokemon.dto.PokemonDTO;
 import com.valhala.mypokedex.domain.pokemon.ports.PokeApiPort;
 import com.valhala.mypokedex.domain.pokemon.usecase.GetPokemonUseCase;
@@ -43,7 +43,7 @@ class PokemonControllerTest {
     DataSource dataSource;
 
     @Inject
-    PokemonCaffeineCacheAdapter cacheAdapter;
+    PokemonCachePort cacheAdapter;
 
     @MockBean(PokeApiPort.class)
     PokeApiPort pokeApiPortMock() {
@@ -56,20 +56,22 @@ class PokemonControllerTest {
         Mockito.reset(pokeApiPort);
 
         // clear pokemons table to avoid cross-test contamination
-        try (Connection c = dataSource.getConnection(); PreparedStatement ps = c.prepareStatement("DELETE FROM pokemons")) {
+        try (Connection c = dataSource.getConnection();
+                PreparedStatement ps = c.prepareStatement("DELETE FROM pokemons")) {
             ps.executeUpdate();
         }
 
-        // clear the caffeine cache via reflection (cache field is private)
+        // best-effort: if underlying adapter has a field named 'cache' and it's a
+        // Caffeine cache, invalidate it
         try {
-            Field f = PokemonCaffeineCacheAdapter.class.getDeclaredField("cache");
+            Field f = cacheAdapter.getClass().getDeclaredField("cache");
             f.setAccessible(true);
             Object cache = f.get(cacheAdapter);
             if (cache instanceof com.github.benmanes.caffeine.cache.Cache) {
                 ((com.github.benmanes.caffeine.cache.Cache<?, ?>) cache).invalidateAll();
             }
         } catch (NoSuchFieldException ignored) {
-            // if field changes in future, ignore (best-effort cleanup)
+            // if field not present, ignore (best-effort cleanup)
         }
     }
 
@@ -91,8 +93,7 @@ class PokemonControllerTest {
                 Map.of("speed", 90),
                 Map.of("front_default", "https://.../sprite.png"),
                 List.of("static"),
-                "https://pokeapi.co/api/v2/pokemon/pikachu"
-        );
+                "https://pokeapi.co/api/v2/pokemon/pikachu");
 
         Mockito.when(pokeApiPort.fetchPokemonRaw("pikachu")).thenReturn(Optional.of(rawJson));
 

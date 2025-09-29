@@ -36,6 +36,9 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly("org.yaml:snakeyaml")
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.6")
+    // Lettuce + Micronaut Redis (Lettuce) for Redis-backed cache adapter
+    implementation("io.micronaut.redis:micronaut-redis-lettuce")
+    implementation("io.lettuce:lettuce-core:6.2.5.RELEASE")
     testImplementation("com.jayway.jsonpath:json-path:2.9.0")
     testImplementation("io.micronaut.test:micronaut-test-rest-assured")
     testImplementation("net.minidev:json-smart:2.5.2")
@@ -47,7 +50,6 @@ dependencies {
     testRuntimeOnly("com.h2database:h2:2.1.214")
     testImplementation("com.zaxxer:HikariCP:5.0.1")
 }
-
 
 application {
     mainClass = "com.valhala.mypokedex.application.Application"

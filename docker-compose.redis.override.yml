@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  app:
+    environment:
+      - CACHE_STRATEGY=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - WAIT_FOR_DB=true
+  redis:
+    profiles:
+      - redis

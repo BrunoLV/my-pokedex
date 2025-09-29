@@ -1,6 +1,6 @@
 package com.valhala.mypokedex.domain.pokemon.usecase;
 
-import com.valhala.mypokedex.adapter.output.cache.PokemonCaffeineCacheAdapter;
+import com.valhala.mypokedex.domain.pokemon.ports.PokemonCachePort;
 import com.valhala.mypokedex.domain.pokemon.dto.PokemonDTO;
 import com.valhala.mypokedex.domain.pokemon.ports.PokeApiPort;
 import com.valhala.mypokedex.domain.pokemon.repository.PokemonEntity;
@@ -33,7 +33,7 @@ class GetPokemonUseTest {
     PokemonRepository repository;
 
     @Inject
-    PokemonCaffeineCacheAdapter cache;
+    PokemonCachePort cache;
 
     @MockBean(PokeApiPort.class)
     PokeApiPort pokeApiAdapter() {
@@ -45,9 +45,9 @@ class GetPokemonUseTest {
         return Mockito.mock(PokemonRepository.class);
     }
 
-    @MockBean(PokemonCaffeineCacheAdapter.class)
-    PokemonCaffeineCacheAdapter caffeineCacheAdapter() {
-        return Mockito.mock(PokemonCaffeineCacheAdapter.class);
+    @MockBean(PokemonCachePort.class)
+    PokemonCachePort cacheAdapter() {
+        return Mockito.mock(PokemonCachePort.class);
     }
 
     @Test

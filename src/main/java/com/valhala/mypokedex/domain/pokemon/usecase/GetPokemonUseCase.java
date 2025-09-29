@@ -2,7 +2,7 @@ package com.valhala.mypokedex.domain.pokemon.usecase;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.valhala.mypokedex.adapter.output.cache.PokemonCaffeineCacheAdapter;
+import com.valhala.mypokedex.domain.pokemon.ports.PokemonCachePort;
 import com.valhala.mypokedex.domain.pokemon.dto.PokemonDTO;
 import com.valhala.mypokedex.domain.pokemon.ports.PokeApiPort;
 import com.valhala.mypokedex.domain.pokemon.repository.PokemonEntity;
@@ -20,10 +20,10 @@ public class GetPokemonUseCase {
     private static final Logger LOG = LoggerFactory.getLogger(GetPokemonUseCase.class);
     private final PokemonRepository repository;
     private final PokeApiPort upstream;
-    private final PokemonCaffeineCacheAdapter cache;
+    private final PokemonCachePort cache;
 
     @Inject
-    public GetPokemonUseCase(PokemonRepository repository, PokeApiPort upstream, PokemonCaffeineCacheAdapter cache) {
+    public GetPokemonUseCase(PokemonRepository repository, PokeApiPort upstream, PokemonCachePort cache) {
         this.repository = repository;
         this.upstream = upstream;
         this.cache = cache;
@@ -55,8 +55,7 @@ public class GetPokemonUseCase {
                     new HashMap<>(),
                     new HashMap<>(),
                     new ArrayList<>(),
-                    "local"
-            );
+                    "local");
             cache.put(identifier.toLowerCase(), dto);
             return Optional.of(dto);
         }
@@ -90,7 +89,8 @@ public class GetPokemonUseCase {
                         JsonNode typeObj = t.path("type");
                         if (typeObj != null) {
                             String typeName = typeObj.path("identifier").asText(null);
-                            if (typeName != null) types.add(typeName);
+                            if (typeName != null)
+                                types.add(typeName);
                         }
                     }
                 }
@@ -102,7 +102,8 @@ public class GetPokemonUseCase {
                     for (JsonNode s : statsNode) {
                         String statName = s.path("stat").path("identifier").asText(null);
                         int base = s.path("base_stat").asInt(0);
-                        if (statName != null) baseStats.put(statName, base);
+                        if (statName != null)
+                            baseStats.put(statName, base);
                     }
                 }
 
@@ -135,7 +136,8 @@ public class GetPokemonUseCase {
                 if (abilitiesNode.isArray()) {
                     for (JsonNode a : abilitiesNode) {
                         String abilityName = a.path("ability").path("identifier").asText(null);
-                        if (abilityName != null) abilities.add(abilityName);
+                        if (abilityName != null)
+                            abilities.add(abilityName);
                     }
                 }
 
@@ -154,15 +156,15 @@ public class GetPokemonUseCase {
                         new HashMap<>(),
                         new HashMap<>(),
                         new ArrayList<>(),
-                        "https://pokeapi.co/api/v2/pokemon/" + identifier
-                );
+                        "https://pokeapi.co/api/v2/pokemon/" + identifier);
                 cache.put(identifier.toLowerCase(), dto);
                 return Optional.of(dto);
             }
         }
 
         LOG.info("Upstream did not return data for '{}'", identifier);
-        // If upstream didn't return a payload, do not fabricate a result: let caller handle 404/not-found
+        // If upstream didn't return a payload, do not fabricate a result: let caller
+        // handle 404/not-found
         return Optional.empty();
     }
 }

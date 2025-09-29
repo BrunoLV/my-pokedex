@@ -1,0 +1,6 @@
+version: '3.8'
+services:
+  app:
+    environment:
+      - CACHE_STRATEGY=caffeine
+      - WAIT_FOR_DB=false
