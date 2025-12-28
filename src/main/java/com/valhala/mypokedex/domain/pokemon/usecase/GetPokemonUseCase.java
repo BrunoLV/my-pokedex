@@ -15,6 +15,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * Use case responsible for retrieving information about a Pokémon.
+ *
+ * Flow:
+ * 1) Check local cache (fast)
+ * 2) If not found, check local repository (DB)
+ * 3) If still not found, query upstream (PokeAPI), persist the raw payload
+ *    and convert the returned JSON into {@link PokemonDTO}
+ *
+ * Logs document each step to aid diagnosis.
+ */
 @Singleton
 public class GetPokemonUseCase {
     private static final Logger LOG = LoggerFactory.getLogger(GetPokemonUseCase.class);
@@ -29,12 +40,25 @@ public class GetPokemonUseCase {
         this.cache = cache;
     }
 
-    // No no-arg constructor: prefer dependency injection for all collaborators
-
+    /**
+     * Retrieves a Pokémon by identifier.
+     *
+     * Attempt order:
+     * - cache (key stored in lowercase)
+     * - local repository (database)
+     * - upstream (PokeAPI) — when available, persist the raw payload and map it
+     *
+     * Notes:
+     * - On JSON parsing failure, returns a minimal DTO as a fallback
+     * - If upstream does not find the resource, returns Optional.empty()
+     *
+     * @param identifier Pokémon name or id (e.g. "pikachu" or "25")
+     * @return Optional containing {@link PokemonDTO} if found; Optional.empty() otherwise
+     */
     @Connectable
     public Optional<PokemonDTO> getPokemon(String identifier) {
         LOG.debug("getPokemon called with identifier='{}'", identifier);
-        // check cache
+        // Check local cache (key is used in lowercase)
         Optional<PokemonDTO> cached = cache.get(identifier.toLowerCase());
         if (cached.isPresent()) {
             LOG.info("Cache hit for '{}'", identifier);
@@ -42,11 +66,11 @@ public class GetPokemonUseCase {
         }
         LOG.debug("Cache miss for '{}'", identifier);
 
-        // check repository
+        // Check local repository (DB) by identifier
         Optional<PokemonEntity> entity = repository.findByIdentifier(identifier);
         if (entity.isPresent()) {
             LOG.info("Repository hit for '{}'", identifier);
-            // map to DTO minimally
+            // Map entity to DTO with minimal data (source: local)
             PokemonEntity e = entity.get();
             PokemonDTO dto = new PokemonDTO(
                     (int) e.getId(),
@@ -61,19 +85,19 @@ public class GetPokemonUseCase {
         }
         LOG.debug("Repository miss for '{}'", identifier);
 
-        // call upstream
+        // Query upstream service (PokeAPI) if not present locally
         LOG.info("Fetching pokemon '{}' from upstream", identifier);
         Optional<String> raw = upstream.fetchPokemonRaw(identifier);
         if (raw.isPresent()) {
             String body = raw.get();
-            // persist raw payload
+            // Persist raw payload returned by upstream for local storage
             PokemonEntity e = new PokemonEntity();
             e.setIdentifier(identifier);
             e.setId(0);
             e.setPayload(body);
             repository.save(e);
 
-            // parse JSON into DTO per contract
+            // Convert upstream JSON to PokemonDTO according to the contract
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(body);
@@ -95,7 +119,7 @@ public class GetPokemonUseCase {
                     }
                 }
 
-                // base_stats from stats array
+                // base_stats from the 'stats' array
                 Map<String, Integer> baseStats = new HashMap<>();
                 JsonNode statsNode = root.path("stats");
                 if (statsNode.isArray()) {
@@ -107,7 +131,7 @@ public class GetPokemonUseCase {
                     }
                 }
 
-                // sprites: take first-level string fields
+                // sprites: take first-level fields and store them as strings
                 Map<String, String> sprites = new HashMap<>();
                 JsonNode spritesNode = root.path("sprites");
                 if (spritesNode.isObject()) {
@@ -120,7 +144,7 @@ public class GetPokemonUseCase {
                         } else if (val.isNull()) {
                             sprites.put(key, null);
                         } else {
-                            // non-textual (object) — serialize to string as fallback
+                            // non-textual value (object) — serialize to string as a fallback
                             try {
                                 sprites.put(key, mapper.writeValueAsString(val));
                             } catch (Exception ex) {
@@ -148,7 +172,7 @@ public class GetPokemonUseCase {
                 return Optional.of(dto);
             } catch (Exception parseEx) {
                 LOG.error("Failed to parse upstream payload for '{}'", identifier, parseEx);
-                // fallback to minimal DTO on parse errors
+                // On parsing error, return a minimal DTO with source pointing to PokeAPI
                 PokemonDTO dto = new PokemonDTO(
                         0,
                         identifier,
@@ -163,8 +187,8 @@ public class GetPokemonUseCase {
         }
 
         LOG.info("Upstream did not return data for '{}'", identifier);
-        // If upstream didn't return a payload, do not fabricate a result: let caller
-        // handle 404/not-found
+        // If upstream did not return a payload, do not fabricate a local result;
+        // return Optional.empty() so the caller can handle 404/not-found.
         return Optional.empty();
     }
 }
